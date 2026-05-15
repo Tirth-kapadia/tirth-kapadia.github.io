@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+]<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -19,14 +19,23 @@
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
+  html {
+    scroll-behavior: smooth;
+    background: #f8f6f3;
+  }
 
   body {
     font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
+    background: transparent;
     color: var(--text);
     font-size: 15px;
     line-height: 1.75;
+  }
+
+  /* Canvas sits at z:1, sections at z:2, so canvas shows through transparent section areas */
+  section, .hero, footer {
+    position: relative;
+    z-index: 2;
   }
 
   /* NAV */
@@ -177,8 +186,10 @@
   }
 
   .status-card {
-    background: var(--white);
-    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(212,223,232,0.7);
     padding: 1.25rem 1.5rem;
     min-width: 200px;
   }
@@ -249,13 +260,18 @@
   }
 
   .interest-item {
-    background: var(--white);
-    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(212,223,232,0.7);
     padding: 1.25rem 1.5rem;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, background 0.2s;
   }
 
-  .interest-item:hover { border-color: var(--blue); }
+  .interest-item:hover {
+    border-color: var(--blue);
+    background: rgba(255,255,255,0.72);
+  }
 
   .interest-q {
     font-family: 'EB Garamond', serif;
@@ -272,19 +288,22 @@
   }
 
   /* PUBLICATIONS */
-  .pub-list { display: grid; gap: 1.5rem; }
+  .pub-list { display: grid; gap: 1.25rem; }
 
   .pub-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    padding: 2rem 2.25rem;
-    transition: border-color 0.2s, transform 0.2s;
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(212,223,232,0.7);
+    padding: 1.75rem 2.25rem;
+    transition: border-color 0.2s, transform 0.2s, background 0.2s;
     position: relative;
   }
 
   .pub-card:hover {
     border-color: var(--blue);
     transform: translateY(-2px);
+    background: rgba(255,255,255,0.72);
   }
 
   .pub-top {
@@ -323,33 +342,33 @@
     font-weight: 500;
     color: var(--dark);
     line-height: 1.4;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.5rem;
   }
 
-  .pub-authors {
-    font-size: 0.82rem;
-    color: var(--muted);
-    margin-bottom: 0.75rem;
-  }
-
-  .pub-authors strong { color: var(--text); }
-
-  .pub-abstract {
+  .pub-oneliner {
     font-size: 0.88rem;
     color: var(--muted);
-    line-height: 1.75;
-    margin-bottom: 1.25rem;
+    line-height: 1.7;
+    margin-bottom: 0.9rem;
+    max-width: 640px;
   }
 
-  .pub-citation {
-    font-size: 0.78rem;
-    color: #999;
-    font-style: italic;
+  .pub-taglist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1.1rem;
+  }
+
+  .pub-tag {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    color: var(--muted);
     background: var(--bg);
-    padding: 0.6rem 0.9rem;
-    border-left: 2px solid var(--border);
-    margin-bottom: 1.25rem;
-    line-height: 1.6;
+    border: 1px solid var(--border);
+    padding: 0.2rem 0.6rem;
+    border-radius: 2px;
   }
 
   .friston-note {
@@ -358,7 +377,7 @@
     background: var(--light-blue);
     padding: 0.6rem 0.9rem;
     border-left: 2px solid var(--blue);
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem;
     line-height: 1.6;
   }
 
@@ -477,6 +496,65 @@
   }
 
   /* RESPONSIVE */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 4px;
+    background: none;
+    border: none;
+  }
+
+  .hamburger span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: var(--dark);
+    transition: all 0.3s ease;
+  }
+
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .mobile-menu {
+    display: none;
+    position: fixed;
+    top: 54px;
+    left: 0;
+    right: 0;
+    background: rgba(248, 246, 243, 0.98);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 1.25rem;
+    z-index: 99;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .mobile-menu.open { display: flex; }
+
+  .mobile-menu a {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border);
+    transition: color 0.2s;
+  }
+
+  .mobile-menu a:last-child { border-bottom: none; }
+  .mobile-menu a:hover { color: var(--blue); }
+
+  .nav-links a.active { color: var(--blue); }
+
+  @media (max-width: 700px) {
+    .hamburger { display: flex; }
+  }
   @media (max-width: 700px) {
     nav { padding: 0 1.25rem; }
     .nav-links { display: none; }
@@ -487,7 +565,6 @@
     .about-grid { grid-template-columns: 1fr; }
     .hero h1 { font-size: 2.6rem; }
   }
-  /* FEEDBACK */
   .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -532,8 +609,10 @@
   textarea { resize: vertical; min-height: 140px; }
 
   .form-wrap {
-    background: var(--white);
-    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(212,223,232,0.7);
     padding: 2.25rem 2.5rem;
     max-width: 640px;
   }
@@ -593,6 +672,10 @@
 </style>
 </head>
 <body>
+<!-- Cream base layer — always behind canvas -->
+<div style="position:fixed;inset:0;background:#f8f6f3;z-index:-10;pointer-events:none;"></div>
+<!-- Neural canvas — z:1, above base, below sections z:2 -->
+<canvas id="neuralCanvas" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;"></canvas>
 
 <!-- NAV -->
 <nav>
@@ -605,7 +688,18 @@
     <li><a href="#publications">Publications</a></li>
     <li><a href="#about">About</a></li>
     <li><a href="#feedback">Feedback</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#interests" onclick="closeMobile()">Research</a>
+  <a href="#publications" onclick="closeMobile()">Publications</a>
+  <a href="#about" onclick="closeMobile()">About</a>
+  <a href="#feedback" onclick="closeMobile()">Feedback</a>
+</div>
 
 <!-- HERO -->
 <div class="hero">
@@ -627,7 +721,7 @@
           <p class="status-label">Current Status</p>
           <div class="status-item">
             <span class="dot green"></span>
-            4 Published Works
+            5 Published Works
           </div>
           <div class="status-item">
             <span class="dot green"></span>
@@ -691,20 +785,21 @@
           <span class="pub-status">Open Access · Zenodo</span>
         </div>
         <h3>Neurological and Thermodynamic Mechanisms Underlying Anomalous Presence Perception</h3>
-        <p class="pub-authors"><strong>Kapadia, T.</strong> (2025). Version 16. Zenodo.</p>
-        <p class="pub-abstract">
-          A unified scientific explanation for the universal human experience of sensing a deceased person's presence. Proposes four interacting mechanisms: infrasound-induced cortical arousal operating below conscious sensory threshold, predictive processing failure during bereavement, Neural Persistence — the continued firing of long-term potentiated neural pathways built around a specific individual — and Cardiac Neural Persistence, the encoding of relational memory in the heart's intrinsic nervous system. Draws on thermodynamics, neuroscience, olfactory biology, and the quantum observer analogy.
-        </p>
-        <p class="pub-citation">
-          Kapadia, T. (2025). Neurological and Thermodynamic Mechanisms Underlying Anomalous Presence Perception (v16). Zenodo. https://doi.org/10.5281/zenodo.19161509
-        </p>
+        <p class="pub-oneliner">A unified mechanistic explanation for the universal experience of sensing a deceased person's presence — proposing infrasound, predictive processing failure, and Neural Persistence as interacting biological causes.</p>
+        <div class="pub-taglist">
+          <span class="pub-tag">Neuroscience</span>
+          <span class="pub-tag">Predictive Processing</span>
+          <span class="pub-tag">Bereavement</span>
+          <span class="pub-tag">Thermodynamics</span>
+          <span class="pub-tag">Neural Persistence</span>
+        </div>
         <div class="friston-note">
-          Correspondence with Prof. Karl Friston (University College London) — who described the work as "extremely well informed."
+          Prof. Karl Friston (UCL) described this work as "extremely well informed."
         </div>
         <div class="pub-meta">
           <a href="https://doi.org/10.5281/zenodo.19161509" target="_blank" class="pub-link">View on Zenodo</a>
-          <span class="pub-doi">DOI: 10.5281/zenodo.19161509</span>
-          <span class="pub-year">2025 — Ongoing</span>
+          <span class="pub-doi">10.5281/zenodo.19161509</span>
+          <span class="pub-year">2025</span>
         </div>
       </div>
 
@@ -715,16 +810,16 @@
           <span class="pub-status">Open Access · Zenodo</span>
         </div>
         <h3>Consciousness? — The Accident and Its Cost</h3>
-        <p class="pub-authors"><strong>Kapadia, T.</strong> (2026). Zenodo.</p>
-        <p class="pub-abstract">
-          A philosophical essay examining consciousness not as a triumph of evolution but as an unresolved consequence of it. Argues that self-awareness created the problems it was supposed to solve, constructed an illusion of a self it cannot see through, and left the species that has it permanently inside the question it cannot answer. Closes on the hard problem of consciousness and proposes a structural parallel between the quantum observer collapse and the mechanism of conscious perception as a direction worth pursuing.
-        </p>
-        <p class="pub-citation">
-          Kapadia, T. (2026). Consciousness? — The Accident and Its Cost. Zenodo. https://doi.org/10.5281/zenodo.19468109
-        </p>
+        <p class="pub-oneliner">Argues that consciousness was not an evolutionary achievement but an unresolved consequence — one that constructed an illusion of self it cannot see through, and left the species permanently inside the question it cannot answer.</p>
+        <div class="pub-taglist">
+          <span class="pub-tag">Philosophy of Mind</span>
+          <span class="pub-tag">Hard Problem</span>
+          <span class="pub-tag">Evolutionary Biology</span>
+          <span class="pub-tag">Quantum Observer</span>
+        </div>
         <div class="pub-meta">
           <a href="https://doi.org/10.5281/zenodo.19468109" target="_blank" class="pub-link">View on Zenodo</a>
-          <span class="pub-doi">DOI: 10.5281/zenodo.19468109</span>
+          <span class="pub-doi">10.5281/zenodo.19468109</span>
           <span class="pub-year">2026</span>
         </div>
       </div>
@@ -736,16 +831,16 @@
           <span class="pub-status">Open Access · Zenodo</span>
         </div>
         <h3>Proposed Research Directions — An Empirical Testing Framework for the Anomalous Presence Perception Hypothesis</h3>
-        <p class="pub-authors"><strong>Kapadia, T.</strong> (2026). Zenodo.</p>
-        <p class="pub-abstract">
-          A structured empirical testing framework developed as a companion to the Anomalous Presence Perception Hypothesis. Proposes specific methodological approaches across six categories: surveys, existing dataset re-analysis, laboratory studies, neuroimaging, field studies, and computational modelling. Submitted by an independent researcher seeking methodological critique and potential collaboration.
-        </p>
-        <p class="pub-citation">
-          Kapadia, T. (2026). Proposed Research Directions — An Empirical Testing Framework for the Anomalous Presence Perception Hypothesis. Zenodo. https://doi.org/10.5281/zenodo.19492578
-        </p>
+        <p class="pub-oneliner">A structured companion to the hypothesis — proposing testable methodologies across surveys, neuroimaging, laboratory studies, field research, and computational modelling.</p>
+        <div class="pub-taglist">
+          <span class="pub-tag">Empirical Methods</span>
+          <span class="pub-tag">Neuroimaging</span>
+          <span class="pub-tag">EEG</span>
+          <span class="pub-tag">Computational Modelling</span>
+        </div>
         <div class="pub-meta">
           <a href="https://doi.org/10.5281/zenodo.19492578" target="_blank" class="pub-link">View on Zenodo</a>
-          <span class="pub-doi">DOI: 10.5281/zenodo.19492578</span>
+          <span class="pub-doi">10.5281/zenodo.19492578</span>
           <span class="pub-year">2026</span>
         </div>
       </div>
@@ -757,16 +852,40 @@
           <span class="pub-status">Open Access · Zenodo</span>
         </div>
         <h3>Resonance — On Subconscious Perception, Felt Presence, and the Architecture of Awareness</h3>
-        <p class="pub-authors"><strong>Kapadia, T.</strong> (2026). Zenodo.</p>
-        <p class="pub-abstract">
-          An essay on the subconscious architecture of awareness — arguing that what we call intuition, presence, and felt knowing are not mystical but mechanistic: the outputs of a system that processes far more than it surfaces. Draws on neuroscience, predictive processing, and the phenomenology of perception to propose that consciousness is not the origin of experience but its final layer.
-        </p>
-        <p class="pub-citation">
-          Kapadia, T. (2026). Resonance — On Subconscious Perception, Felt Presence, and the Architecture of Awareness. Zenodo. https://doi.org/10.5281/zenodo.20038959
-        </p>
+        <p class="pub-oneliner">Proposes that consciousness is not the origin of experience but its final layer — and that resonance, from quantum coherence to neural oscillation, is the structural principle running through all of it.</p>
+        <div class="pub-taglist">
+          <span class="pub-tag">Quantum Consciousness</span>
+          <span class="pub-tag">Neural Oscillation</span>
+          <span class="pub-tag">Subconscious</span>
+          <span class="pub-tag">Orch-OR</span>
+          <span class="pub-tag">Metacognition</span>
+        </div>
         <div class="pub-meta">
           <a href="https://doi.org/10.5281/zenodo.20038959" target="_blank" class="pub-link">View on Zenodo</a>
-          <span class="pub-doi">DOI: 10.5281/zenodo.20038959</span>
+          <span class="pub-doi">10.5281/zenodo.20038959</span>
+          <span class="pub-year">2026</span>
+        </div>
+      </div>
+
+      <!-- ANTHROPOGENIC EVOLUTION -->
+      <div class="pub-card fade-in">
+        <div class="pub-top">
+          <span class="pub-type">Research Paper</span>
+          <span class="pub-status">Open Access · Zenodo</span>
+        </div>
+        <h3>Anthropogenic Evolution — The Third Driver of Evolutionary Change</h3>
+        <p class="pub-oneliner">Proposes human cultural, technological, and ideological agency as a third evolutionary driver — alongside natural selection and mutation — tracing its origin to Neanderthal interbreeding and its present in CRISPR, dietary ideology, and the sixth mass extinction.</p>
+        <div class="pub-taglist">
+          <span class="pub-tag">Evolutionary Biology</span>
+          <span class="pub-tag">Epigenetics</span>
+          <span class="pub-tag">CRISPR</span>
+          <span class="pub-tag">Neanderthal</span>
+          <span class="pub-tag">Lamarck</span>
+          <span class="pub-tag">Philosophy of Biology</span>
+        </div>
+        <div class="pub-meta">
+          <a href="https://doi.org/10.5281/zenodo.20178551" target="_blank" class="pub-link">View on Zenodo</a>
+          <span class="pub-doi">10.5281/zenodo.20178551</span>
           <span class="pub-year">2026</span>
         </div>
       </div>
@@ -774,8 +893,6 @@
     </div>
   </div>
 </section>
-
-<!-- ABOUT -->
 <section id="about">
   <div class="container">
     <div class="section-header">
@@ -845,6 +962,7 @@
               <option value="essay">Consciousness Essay</option>
               <option value="resonance">Resonance Essay</option>
               <option value="research">Research Directions Framework</option>
+              <option value="anthropogenic">Anthropogenic Evolution</option>
               <option value="general">General</option>
             </select>
           </div>
@@ -874,6 +992,224 @@
 </footer>
 
 <script>
+  // ── NEURAL BACKGROUND ──────────────────────────────────────────
+  const canvas = document.getElementById('neuralCanvas');
+  const ctx    = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  window.addEventListener('load', () => {
+    resize();
+    window.addEventListener('resize', resize);
+
+    const mobile     = window.innerWidth < 700;
+    const COUNT      = mobile ? 18 : 38;
+    const MAX_DIST   = mobile ? 140 : 190;
+
+    /* ── Build neurons ──────────────────────────────────── */
+    const neurons = Array.from({ length: COUNT }, () => {
+      const numArms = 4 + Math.floor(Math.random() * 4);   // 4–7 dendrite arms
+      const arms = Array.from({ length: numArms }, (_, i) => {
+        const baseAngle = (i / numArms) * Math.PI * 2 + (Math.random() - 0.5) * 0.7;
+        const len       = 22 + Math.random() * 28;
+        const curve     = (Math.random() - 0.5) * 0.8;     // bezier curve amount
+        return {
+          angle: baseAngle, len, curve,
+          // 1–2 sub-branches near the tip
+          subs: Math.random() < 0.7
+            ? [{ da:  0.55 + Math.random()*0.3, dl: 0.45 },
+               { da: -(0.55 + Math.random()*0.3), dl: 0.4 }]
+            : [{ da:  0.6, dl: 0.45 }]
+        };
+      });
+      return {
+        x:  Math.random() * canvas.width,
+        y:  Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.18,
+        vy: (Math.random() - 0.5) * 0.18,
+        r:  10 + Math.random() * 8,      // soma radius 10–18 px — BIG and clear
+        pulse:      Math.random() * Math.PI * 2,
+        pulseSpeed: 0.007 + Math.random() * 0.01,
+        fireGlow:   0,
+        arms,
+      };
+    });
+
+    /* ── Traveling signals ─────────────────────────────── */
+    const signals  = [];
+    let   lastFire = 0;
+
+    function spawnSignal() {
+      const pool = [];
+      for (let i = 0; i < neurons.length; i++)
+        for (let j = i + 1; j < neurons.length; j++) {
+          const dx = neurons[i].x - neurons[j].x;
+          const dy = neurons[i].y - neurons[j].y;
+          if (Math.sqrt(dx*dx + dy*dy) < MAX_DIST) pool.push([i, j]);
+        }
+      if (!pool.length) return;
+      const pair = pool[Math.floor(Math.random() * pool.length)];
+      const [a, b] = Math.random() < 0.5 ? pair : [pair[1], pair[0]];
+      signals.push({ from: a, to: b, t: 0, speed: 0.009 + Math.random() * 0.013 });
+    }
+
+    /* ── Draw one neuron ────────────────────────────────── */
+    function drawNeuron(n, alpha) {
+      const pulse = 0.6 + Math.sin(n.pulse) * 0.25;
+      const a     = alpha * pulse;
+
+      // Dendrite arms (curved, branching)
+      n.arms.forEach(arm => {
+        const cp1x = n.x + Math.cos(arm.angle + arm.curve) * arm.len * 0.5;
+        const cp1y = n.y + Math.sin(arm.angle + arm.curve) * arm.len * 0.5;
+        const ex   = n.x + Math.cos(arm.angle) * (n.r + arm.len);
+        const ey   = n.y + Math.sin(arm.angle) * (n.r + arm.len);
+
+        ctx.beginPath();
+        ctx.moveTo(n.x + Math.cos(arm.angle) * n.r,
+                   n.y + Math.sin(arm.angle) * n.r);
+        ctx.quadraticCurveTo(cp1x, cp1y, ex, ey);
+        ctx.strokeStyle = `rgba(27,58,92,${a * 0.9})`;
+        ctx.lineWidth   = 1.4;
+        ctx.stroke();
+
+        // sub-branches
+        arm.subs.forEach(sub => {
+          const ba = arm.angle + sub.da;
+          const bl = arm.len   * sub.dl;
+          ctx.beginPath();
+          ctx.moveTo(ex, ey);
+          ctx.lineTo(ex + Math.cos(ba) * bl, ey + Math.sin(ba) * bl);
+          ctx.strokeStyle = `rgba(27,58,92,${a * 0.6})`;
+          ctx.lineWidth   = 0.8;
+          ctx.stroke();
+        });
+      });
+
+      // Fire halo — glows bright when signal arrives
+      if (n.fireGlow > 0.05) {
+        const halo = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 4.5);
+        halo.addColorStop(0,   `rgba(80,200,255,${n.fireGlow * 0.55})`);
+        halo.addColorStop(0.5, `rgba(46,140,210,${n.fireGlow * 0.2})`);
+        halo.addColorStop(1,   'rgba(46,140,210,0)');
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r * 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = halo;
+        ctx.fill();
+      }
+
+      // Soma body — radial gradient for 3D look
+      const somaGrad = ctx.createRadialGradient(
+        n.x - n.r * 0.3, n.y - n.r * 0.3, n.r * 0.1,
+        n.x, n.y, n.r
+      );
+      const fire = n.fireGlow;
+      somaGrad.addColorStop(0,   `rgba(${80 + fire*80},${140 + fire*60},${200 + fire*55},${a})`);
+      somaGrad.addColorStop(0.55,`rgba(46,100,160,${a})`);
+      somaGrad.addColorStop(1,   `rgba(27,58,92,${a})`);
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.fillStyle = somaGrad;
+      ctx.fill();
+
+      // Soma border ring
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(27,58,92,${a * 0.7})`;
+      ctx.lineWidth   = 1.2;
+      ctx.stroke();
+
+      // Nucleus
+      const nucGrad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r * 0.4);
+      nucGrad.addColorStop(0, `rgba(180,215,250,${a * 0.9})`);
+      nucGrad.addColorStop(1, `rgba(80,140,200,${a * 0.5})`);
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r * 0.4, 0, Math.PI * 2);
+      ctx.fillStyle = nucGrad;
+      ctx.fill();
+    }
+
+    /* ── Main loop ──────────────────────────────────────── */
+    function draw(ts) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Spawn signals
+      if (ts - lastFire > 500 + Math.random() * 800) {
+        spawnSignal();
+        if (Math.random() < 0.5) spawnSignal();
+        lastFire = ts;
+      }
+
+      // Axon connection lines (thin, between nearby neurons)
+      for (let i = 0; i < neurons.length; i++) {
+        for (let j = i + 1; j < neurons.length; j++) {
+          const dx   = neurons[i].x - neurons[j].x;
+          const dy   = neurons[i].y - neurons[j].y;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < MAX_DIST) {
+            const a = (1 - dist / MAX_DIST) * 0.18;
+            ctx.beginPath();
+            ctx.moveTo(neurons[i].x, neurons[i].y);
+            ctx.lineTo(neurons[j].x, neurons[j].y);
+            ctx.strokeStyle = `rgba(27,58,92,${a})`;
+            ctx.lineWidth   = 0.6;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Traveling signals — bright NEON cyan, 100% visible
+      for (let s = signals.length - 1; s >= 0; s--) {
+        const sig = signals[s];
+        sig.t += sig.speed;
+        const fn = neurons[sig.from], tn = neurons[sig.to];
+        const dx = tn.x - fn.x, dy = tn.y - fn.y;
+        if (Math.sqrt(dx*dx + dy*dy) > MAX_DIST) { signals.splice(s, 1); continue; }
+        const px = fn.x + dx * sig.t;
+        const py = fn.y + dy * sig.t;
+
+        // Outer glow
+        const outer = ctx.createRadialGradient(px, py, 0, px, py, 16);
+        outer.addColorStop(0,   'rgba(0,220,255,0.6)');
+        outer.addColorStop(0.4, 'rgba(0,180,230,0.25)');
+        outer.addColorStop(1,   'rgba(0,160,220,0)');
+        ctx.beginPath();
+        ctx.arc(px, py, 16, 0, Math.PI * 2);
+        ctx.fillStyle = outer;
+        ctx.fill();
+
+        // Inner bright core
+        ctx.beginPath();
+        ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,1)';
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(px, py, 2, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,230,255,1)';
+        ctx.fill();
+
+        if (sig.t >= 1) { tn.fireGlow = 1.0; signals.splice(s, 1); }
+      }
+
+      // Move and draw each neuron
+      neurons.forEach(n => {
+        n.pulse    += n.pulseSpeed;
+        n.fireGlow  = Math.max(0, n.fireGlow - 0.018);
+        n.x += n.vx; n.y += n.vy;
+        if (n.x < -50 || n.x > canvas.width  + 50) n.vx *= -1;
+        if (n.y < -50 || n.y > canvas.height + 50) n.vy *= -1;
+        drawNeuron(n, 0.7 + n.fireGlow * 0.3);
+      });
+
+      requestAnimationFrame(draw);
+    }
+
+    requestAnimationFrame(draw);
+  });
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -882,7 +1218,43 @@
     });
   }, { threshold: 0.08 });
 
-  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  document.querySelectorAll('.fade-in').forEach((el, i) => {
+    el.style.transitionDelay = (i * 0.08) + 's';
+    observer.observe(el);
+  });
+
+  // Hamburger menu
+  const hamburger = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileMenu.classList.toggle('open');
+  });
+
+  function closeMobile() {
+    hamburger.classList.remove('open');
+    mobileMenu.classList.remove('open');
+  }
+
+  // Active nav link on scroll
+  const sections = document.querySelectorAll('section[id], div[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+
+  const navObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === '#' + entry.target.id) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+  }, { threshold: 0.4 });
+
+  sections.forEach(section => navObserver.observe(section));
 
   // Feedback form
   document.getElementById('feedbackForm').addEventListener('submit', async function(e) {
