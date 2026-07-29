@@ -301,13 +301,20 @@ window.addEventListener('load', () => {
   });
   zoomPct.addEventListener('click', () => resetView(false));
 
-  // Mouse wheel / trackpad — zoom anchored exactly at the cursor
+  // Plain mouse wheel = normal scroll/pan. Ctrl/Cmd+wheel (or trackpad pinch, which
+  // browsers report as a ctrlKey wheel event) = zoom anchored at the cursor.
   stage.addEventListener('wheel', (e) => {
     e.preventDefault();
-    const r = stage.getBoundingClientRect();
-    const px = e.clientX - r.left, py = e.clientY - r.top;
-    const delta = -e.deltaY * 0.0025;
-    zoomAt(px, py, scale * (1 + delta));
+    if (e.ctrlKey || e.metaKey) {
+      const r = stage.getBoundingClientRect();
+      const px = e.clientX - r.left, py = e.clientY - r.top;
+      const delta = -e.deltaY * 0.01;
+      zoomAt(px, py, scale * (1 + delta));
+    } else {
+      tx -= e.deltaX;
+      ty -= e.deltaY;
+      applyTransform();
+    }
   }, { passive: false });
 
   // Touch: one-finger pan, two-finger pinch anchored at the midpoint between fingers
