@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tirth Kapadia — Reading</title>
+<meta name="robots" content="noindex">
+
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --dark: #1B3A5C;
+    --blue: #2E75A3;
+    --light-blue: #dceef8;
+    --text: #1a1a1a;
+    --muted: #5a6a7a;
+    --border: #d4dfe8;
+    --bg: #f8f6f3;
+    --white: #ffffff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    height: 100%;
+  }
+
+  /* Static background — no canvas, no animation, same base color as the rest of the site */
+  body { background: var(--bg); }
+
+  .viewer-bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(248, 246, 243, 0.97);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .bar-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .back-link {
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--blue); }
+
+  .doc-title {
+    font-family: 'EB Garamond', serif;
+    font-size: 1rem;
+    color: var(--dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .zoom-group {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 0.2rem;
+  }
+
+  .zoom-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: transparent;
+    color: var(--dark);
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+  }
+  .zoom-btn:hover { background: var(--light-blue); }
+  .zoom-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .zoom-btn:disabled:hover { background: transparent; }
+
+  .zoom-pct {
+    font-size: 0.75rem;
+    color: var(--muted);
+    min-width: 44px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .page-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .page-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--border);
+    background: var(--white);
+    color: var(--dark);
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s;
+  }
+  .page-btn:hover { border-color: var(--blue); }
+  .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+  .dl-btn {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--white);
+    background: var(--dark);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border-radius: 3px;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .dl-btn:hover { background: var(--blue); }
+
+  .viewer-stage {
+    display: flex;
+    justify-content: center;
+    padding: 2.5rem 1rem 4rem;
+    min-height: calc(100vh - 58px);
+  }
+
+  .pdf-canvas-wrap {
+    background: var(--white);
+    box-shadow: 0 2px 18px rgba(27,58,92,0.12);
+    border: 1px solid var(--border);
+  }
+
+  #pdfCanvas { display: block; }
+
+  .status-msg {
+    font-family: 'EB Garamond', serif;
+    font-size: 1rem;
+    color: var(--muted);
+    text-align: center;
+    padding-top: 3rem;
+  }
+
+  @media (max-width: 640px) {
+    .viewer-bar { height: auto; padding: 0.6rem 1rem; }
+    .doc-title { display: none; }
+    .bar-right { width: 100%; justify-content: space-between; }
+  }
+</style>
+</head>
+<body>
+
+<div class="viewer-bar">
+  <div class="bar-left">
+    <a href="index.html#publications" class="back-link">&larr; Back to site</a>
+    <span class="doc-title" id="docTitle">Loading&hellip;</span>
+  </div>
+  <div class="bar-right">
+    <div class="page-group">
+      <button class="page-btn" id="prevPage" aria-label="Previous page">&lsaquo;</button>
+      <span id="pageIndicator">&mdash; / &mdash;</span>
+      <button class="page-btn" id="nextPage" aria-label="Next page">&rsaquo;</button>
+    </div>
+    <div class="zoom-group">
+      <button class="zoom-btn" id="zoomOut" aria-label="Zoom out">&minus;</button>
+      <span class="zoom-pct" id="zoomPct">100%</span>
+      <button class="zoom-btn" id="zoomIn" aria-label="Zoom in">+</button>
+    </div>
+    <a id="downloadLink" class="dl-btn" download>Download</a>
+  </div>
+</div>
+
+<div class="viewer-stage">
+  <div id="statusMsg" class="status-msg">Loading document&hellip;</div>
+  <div class="pdf-canvas-wrap" id="canvasWrap" style="display:none;">
+    <canvas id="pdfCanvas"></canvas>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  const params   = new URLSearchParams(window.location.search);
+  const file     = params.get('file');
+  const title    = params.get('title') || (file ? decodeURIComponent(file.replace(/\.pdf$/i,'').replace(/_/g,' ')) : 'Document');
+
+  document.getElementById('docTitle').textContent = title;
+  document.title = title + ' — Tirth Kapadia';
+
+  const downloadLink = document.getElementById('downloadLink');
+  const statusMsg     = document.getElementById('statusMsg');
+  const canvasWrap     = document.getElementById('canvasWrap');
+  const canvas         = document.getElementById('pdfCanvas');
+  const ctx             = canvas.getContext('2d');
+  const pageIndicator = document.getElementById('pageIndicator');
+  const zoomPct         = document.getElementById('zoomPct');
+
+  let pdfDoc      = null;
+  let currentPage = 1;
+  let scale       = 1.25;
+  const MIN_SCALE = 0.5;
+  const MAX_SCALE = 3.0;
+  let rendering   = false;
+
+  if (!file) {
+    statusMsg.textContent = 'No document specified.';
+  } else {
+    downloadLink.href = file;
+    downloadLink.setAttribute('download', file);
+
+    pdfjsLib.getDocument(file).promise.then(doc => {
+      pdfDoc = doc;
+      statusMsg.style.display = 'none';
+      canvasWrap.style.display = 'block';
+      renderPage(currentPage);
+    }).catch(err => {
+      statusMsg.textContent = 'Could not load this document. Try the Download button above.';
+      console.error(err);
+    });
+  }
+
+  function renderPage(num) {
+    if (!pdfDoc || rendering) return;
+    rendering = true;
+    pdfDoc.getPage(num).then(page => {
+      const viewport = page.getViewport({ scale });
+      canvas.width  = viewport.width;
+      canvas.height = viewport.height;
+
+      const renderTask = page.render({ canvasContext: ctx, viewport });
+      renderTask.promise.then(() => {
+        rendering = false;
+        pageIndicator.textContent = num + ' / ' + pdfDoc.numPages;
+        zoomPct.textContent = Math.round(scale / 1.25 * 100) + '%';
+        document.getElementById('prevPage').disabled = num <= 1;
+        document.getElementById('nextPage').disabled = num >= pdfDoc.numPages;
+      });
+    });
+  }
+
+  document.getElementById('prevPage').addEventListener('click', () => {
+    if (currentPage > 1) { currentPage--; renderPage(currentPage); }
+  });
+  document.getElementById('nextPage').addEventListener('click', () => {
+    if (pdfDoc && currentPage < pdfDoc.numPages) { currentPage++; renderPage(currentPage); }
+  });
+
+  document.getElementById('zoomIn').addEventListener('click', () => {
+    scale = Math.min(MAX_SCALE, scale + 0.25);
+    renderPage(currentPage);
+  });
+  document.getElementById('zoomOut').addEventListener('click', () => {
+    scale = Math.max(MIN_SCALE, scale - 0.25);
+    renderPage(currentPage);
+  });
+
+  // Keyboard shortcuts: + / - to zoom, arrow keys to page
+  window.addEventListener('keydown', (e) => {
+    if (e.key === '+' || e.key === '=') document.getElementById('zoomIn').click();
+    if (e.key === '-' || e.key === '_') document.getElementById('zoomOut').click();
+    if (e.key === 'ArrowRight') document.getElementById('nextPage').click();
+    if (e.key === 'ArrowLeft')  document.getElementById('prevPage').click();
+  });
+
+  // Ctrl/Cmd + scroll to zoom, anywhere over the page
+  window.addEventListener('wheel', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      e.preventDefault();
+      if (e.deltaY < 0) document.getElementById('zoomIn').click();
+      else document.getElementById('zoomOut').click();
+    }
+  }, { passive: false });
+</script>
+
+</body>
+</html>
