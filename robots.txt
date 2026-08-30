@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tirth-kapadia.github.io/sitemap.xml
