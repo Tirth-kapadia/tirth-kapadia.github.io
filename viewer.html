@@ -6,10 +6,8 @@
 <title>Tirth Kapadia — Reading</title>
 <meta name="robots" content="noindex">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<noscript><link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,500&family=DM+Sans&display=swap" rel="stylesheet"></noscript>
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" as="style">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500&family=DM+Sans:opsz,wght@9..40,400;9..40,500&display=swap" rel="stylesheet">
 
 <style>
   :root {
@@ -23,14 +21,15 @@
     --white: #ffffff;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   html, body {
     background: var(--bg);
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     color: var(--text);
     height: 100%;
     overflow: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 
   .viewer-bar {
@@ -38,7 +37,6 @@
     top: 0; left: 0; right: 0;
     z-index: 10;
     background: rgba(248, 246, 243, 0.97);
-    backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border);
     height: 58px;
     display: flex;
@@ -56,6 +54,7 @@
     text-decoration: none; letter-spacing: 0.05em;
     display: flex; align-items: center; gap: 0.4rem;
     white-space: nowrap; transition: color 0.2s;
+    min-height: 48px; min-width: 48px;
   }
   .back-link:hover { color: var(--blue); }
 
@@ -76,7 +75,7 @@
     width: 30px; height: 30px; border: none; background: transparent;
     color: var(--dark); font-size: 1.05rem; font-weight: 600; cursor: pointer;
     border-radius: 2px; display: flex; align-items: center; justify-content: center;
-    transition: background 0.15s;
+    transition: background 0.15s; min-height: 48px; min-width: 44px;
   }
   .zoom-btn:hover { background: var(--light-blue); }
 
@@ -91,6 +90,7 @@
     width: 28px; height: 28px; border: 1px solid var(--border); background: var(--white);
     color: var(--dark); cursor: pointer; border-radius: 3px; font-size: 0.85rem;
     display: flex; align-items: center; justify-content: center; transition: border-color 0.15s;
+    min-height: 48px; min-width: 44px;
   }
   .page-btn:hover { border-color: var(--blue); }
   .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -99,10 +99,10 @@
     font-size: 0.75rem; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
     color: var(--white); background: var(--dark); text-decoration: none;
     padding: 0.5rem 1rem; border-radius: 3px; white-space: nowrap; transition: background 0.2s;
+    min-height: 48px; display: inline-flex; align-items: center;
   }
   .dl-btn:hover { background: var(--blue); }
 
-  /* Fixed, clipped viewport — static background, no animation */
   .viewer-stage {
     position: fixed;
     top: 58px; left: 0; right: 0; bottom: 0;
@@ -112,7 +112,6 @@
     contain: strict;
   }
 
-  /* Zoomable/pannable layer — moved purely with CSS transform (GPU-accelerated, no re-render) */
   .zoom-layer {
     position: absolute;
     top: 0; left: 0;
@@ -125,6 +124,7 @@
     box-shadow: 0 2px 18px rgba(27,58,92,0.12);
     border: 1px solid var(--border);
     display: inline-block;
+    border-radius: 3px;
   }
 
   #pdfCanvas { display: block; }
@@ -205,7 +205,7 @@ window.addEventListener('load', () => {
   let pdfDoc      = null;
   let currentPage = 1;
   let baseCssW = 0, baseCssH = 0;
-  const HEADROOM = 3; // render this many times sharper than "100%" so zooming in stays crisp
+  const HEADROOM = 3;
 
   let scale = 1, tx = 0, ty = 0;
   const MIN_SCALE = 0.4, MAX_SCALE = HEADROOM * 1.6;
@@ -273,7 +273,6 @@ window.addEventListener('load', () => {
     applyTransform();
   }
 
-  // Zoom anchored at a point (px, py) in stage/viewport coordinates — exactly like pinch-zooming a photo
   function zoomAt(px, py, newScale) {
     newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, newScale));
     const cx = (px - tx) / scale;
@@ -301,8 +300,6 @@ window.addEventListener('load', () => {
   });
   zoomPct.addEventListener('click', () => resetView(false));
 
-  // Plain mouse wheel = normal scroll/pan. Ctrl/Cmd+wheel (or trackpad pinch, which
-  // browsers report as a ctrlKey wheel event) = zoom anchored at the cursor.
   stage.addEventListener('wheel', (e) => {
     e.preventDefault();
     if (e.ctrlKey || e.metaKey) {
@@ -317,7 +314,6 @@ window.addEventListener('load', () => {
     }
   }, { passive: false });
 
-  // Touch: one-finger pan, two-finger pinch anchored at the midpoint between fingers
   let touchMode = null, lastX = 0, lastY = 0, startDist = 0, startScale = 1, lastTapTime = 0;
 
   function touchDist(t0, t1) { return Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY); }
@@ -365,7 +361,6 @@ window.addEventListener('load', () => {
     else if (e.touches.length === 1) { touchMode = 'pan'; lastX = e.touches[0].clientX; lastY = e.touches[0].clientY; }
   }, { passive: true });
 
-  // Desktop mouse drag to pan
   let dragging = false, dragX = 0, dragY = 0;
   stage.addEventListener('mousedown', (e) => { dragging = true; dragX = e.clientX; dragY = e.clientY; stage.style.cursor = 'grabbing'; });
   window.addEventListener('mousemove', (e) => {
