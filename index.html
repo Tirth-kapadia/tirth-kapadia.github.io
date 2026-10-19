@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f8f6f3">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="google-site-verification" content="JS_erRUUL8ox5MZQAk5MOiwlycO18swCe24YhIs5Vxk" />
 
 <!-- Optimized Title for US/UK Search Intent -->
@@ -104,6 +105,11 @@
 <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 
 <style>
+/* ===== Mobile baseline ===== */
+html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
+a, button, [role="button"] { touch-action: manipulation; }
+body { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+
 /* ===== Design Tokens ===== */
 :root {
   --dark: #1B3A5C;
@@ -243,8 +249,8 @@ body {
   transition: color 0.2s;
 }
 
-.nav-links a:hover,
 .nav-links a.active { color: var(--blue); }
+@media (hover: hover) and (pointer: fine) { .nav-links a:hover { color: var(--blue); } }
 
 /* ===== Mobile Bottom Nav ===== */
 .bottom-nav {
@@ -381,7 +387,7 @@ section, header, footer {
   animation: fadeUp 0.6s ease 0.4s forwards;
 }
 
-.hero-orcid:hover { border-color: var(--blue); }
+@media (hover: hover) and (pointer: fine) { .hero-orcid:hover { border-color: var(--blue); } }
 
 .orcid-icon {
   width: 16px;
@@ -483,9 +489,9 @@ section {
   transition: border-color 0.2s;
 }
 
-.interest-item:hover {
+@media (hover: hover) and (pointer: fine) { .interest-item:hover {
   border-color: var(--blue);
-}
+} }
 
 .interest-q {
   font-family: 'EB Garamond', serif;
@@ -512,10 +518,10 @@ section {
   transition: border-color 0.2s, transform 0.2s;
 }
 
-.pub-card:hover {
+@media (hover: hover) and (pointer: fine) { .pub-card:hover {
   border-color: var(--blue);
   transform: translateY(-2px);
-}
+} }
 
 .pub-top {
   display: flex;
@@ -611,7 +617,7 @@ section {
   transition: gap 0.2s;
 }
 
-.pub-link:hover { gap: 0.55rem; }
+@media (hover: hover) and (pointer: fine) { .pub-link:hover { gap: 0.55rem; } }
 .pub-link::after { content: '→'; }
 
 .pub-doi { font-size: 0.75rem; color: #aaa; font-family: monospace; }
@@ -697,7 +703,7 @@ section {
   font-size: 0.82rem;
 }
 
-.sidebar-item a:hover { text-decoration: underline; }
+@media (hover: hover) and (pointer: fine) { .sidebar-item a:hover { text-decoration: underline; } }
 
 /* ===== Feedback Form ===== */
 .form-grid {
@@ -725,7 +731,7 @@ label {
 
 input, textarea, select {
   font-family: 'DM Sans', sans-serif;
-  font-size: 0.9rem;
+  font-size: 16px;
   padding: 0.7rem 0.9rem;
   border: 1px solid var(--border);
   background: var(--bg);
@@ -784,7 +790,7 @@ textarea { resize: vertical; min-height: 140px; }
   min-height: 48px;
 }
 
-.submit-btn:hover { background: var(--blue); }
+@media (hover: hover) and (pointer: fine) { .submit-btn:hover { background: var(--blue); } }
 .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .form-note { font-size: 0.73rem; color: #bbb; }
